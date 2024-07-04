@@ -1,0 +1,146 @@
+import random
+import sys
+import time
+import pygame
+
+# Initialize Pygame
+pygame.init()
+
+# Screen dimensions
+width, height = 500, 500
+cell_size = 20
+level = 1
+level_time_limit = 60  # Initial time limit for each level in seconds
+
+# Set up display
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Maze Navigation Game")
+
+# Colors
+WHITE = (255, 255, 255)
+LILAC = (164, 91, 170)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+
+# Directions
+UP = (0, -1)
+DOWN = (0, 1)
+LEFT = (-1, 0)
+RIGHT = (1, 0)
+
+# Timer variables
+start_time = None
+
+def start_timer():
+    global start_time
+    start_time = time.time()
+
+def is_time_up():
+    global start_time
+    if start_time is None:
+        return False
+    return time.time() - start_time >= level_time_limit
+
+def draw_timer():
+    if start_time is not None:
+        current_time = int(time.time() - start_time)
+        time_left = max(0, level_time_limit - current_time)
+        font = pygame.font.Font(None, 36)
+        text = font.render(f"Time Left: {time_left}", True, GREEN)
+        screen.blit(text, (10, 10))
+
+def generate_maze(cols, rows):
+    maze = [[0 for _ in range(cols)] for _ in range(rows)]
+    
+    # Recursive backtracking algorithm
+    def carve_passages_from(current_x, current_y):
+        directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        random.shuffle(directions)
+        for direction in directions:
+            new_x = current_x + direction[0] * 2
+            new_y = current_y + direction[1] * 2
+            if 0 <= new_x < cols and 0 <= new_y < rows and maze[new_y][new_x] == 0:
+                maze[current_y + direction[1]][current_x + direction[0]] = 1
+                maze[new_y][new_x] = 1
+                carve_passages_from(new_x, new_y)
+    
+    start_x, start_y = 1, 1
+    maze[start_y][start_x] = 1
+    carve_passages_from(start_x, start_y)
+    
+    # Ensure there's a clear path from start to exit
+    exit_x, exit_y = cols - 2, rows - 2
+    maze[exit_y][exit_x] = 1
+    maze[exit_y - 1][exit_x] = 1
+    
+    return maze, exit_x, exit_y
+
+def draw_maze(maze, player_x, player_y, exit_x, exit_y, cols, rows):
+    for y in range(rows):
+        for x in range(cols):
+            if (x, y) == (player_x, player_y):
+                pygame.draw.rect(screen, BLUE, pygame.Rect(x * cell_size, y * cell_size, cell_size, cell_size))
+            elif (x, y) == (exit_x, exit_y):
+                pygame.draw.rect(screen, GREEN, pygame.Rect(x * cell_size, y * cell_size, cell_size, cell_size))
+            else:
+                color = WHITE if maze[y][x] == 1 else LILAC
+                pygame.draw.rect(screen, color, (x * cell_size, y * cell_size, cell_size, cell_size))
+
+    draw_timer()
+
+def move_player(player_x, player_y, maze, dx, dy, cols, rows):
+    new_x, new_y = player_x + dx, player_y + dy
+    if 0 <= new_x < cols and 0 <= new_y < rows and maze[new_y][new_x] == 1:
+        return new_x, new_y
+    return player_x, player_y
+
+def handle_keys(event, player_x, player_y, maze, cols, rows):
+    if event.key == pygame.K_UP:
+        return move_player(player_x, player_y, maze, *UP, cols, rows)
+    elif event.key == pygame.K_DOWN:
+        return move_player(player_x, player_y, maze, *DOWN, cols, rows)
+    elif event.key == pygame.K_LEFT:
+        return move_player(player_x, player_y, maze, *LEFT, cols, rows)
+    elif event.key == pygame.K_RIGHT:
+        return move_player(player_x, player_y, maze, *RIGHT, cols, rows)
+    return player_x, player_y
+
+def main():
+    global level, level_time_limit
+    
+    cols, rows = 25, 25
+    maze, exit_x, exit_y = generate_maze(cols, rows)
+    player_x, player_y = 1, 1
+    
+    start_timer()
+    clock = pygame.time.Clock()
+    running = True
+    
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                player_x, player_y = handle_keys(event, player_x, player_y, maze, cols, rows)
+        
+        screen.fill(LILAC)
+        draw_maze(maze, player_x, player_y, exit_x, exit_y, cols, rows)
+        pygame.display.flip()
+        
+        if is_time_up():
+            print(f"Level {level} time's up!")
+            level += 1
+            level_time_limit -= 5  # Decrease time limit for next level
+            cols += 2  # Increase maze size for next level
+            rows += 2
+            maze, exit_x, exit_y = generate_maze(cols, rows)
+            player_x, player_y = 1, 1
+            start_timer()
+        
+        clock.tick(30)
+    
+    pygame.quit()
+    sys.exit()
+
+if __name__ == "__main__":
+    main()

@@ -86,11 +86,16 @@ def move_player(key):
 
 def show_message(message, color):
     font = pygame.font.Font(None, 30)
-    text = font.render(message, True, color)
-    text_rect = text.get_rect(center=(width // 2, height // 2))
-    screen.blit(text, text_rect)
-    pygame.display.flip()
-    time.sleep(2)
+    text_lines = message.splitlines()  # Split message into lines
+    for line in text_lines:
+        # Clear screen
+        screen.fill(LILAC)
+        # Render current line
+        text = font.render(line, True, color)
+        text_rect = text.get_rect(center=(width // 2, height // 2))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        time.sleep(2)  # Adjust the delay here (2 seconds per line)
 
 def draw_timer():
     if start_time is not None:
@@ -116,6 +121,18 @@ def next_level():
 
 def main():
     global player_x, player_y, start_time, level_time_limit, cols, rows, cell_size, maze, exit_x, exit_y, score
+
+    # Tutorial messages
+    tutorial_messages = [
+        "Welcome to the Maze Game!",
+        "Use arrow keys to move the character.",
+        "Reach the green square to win each level.",
+        "You have 1 minute per level. Good luck!"
+    ]
+
+    # Display tutorial messages line by line
+    for message in tutorial_messages:
+        show_message(message, WHITE)
 
     generate_maze()
     player_x, player_y = 1, 1

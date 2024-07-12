@@ -102,8 +102,8 @@ def draw_timer():
         current_time = int(time.time() - start_time)
         time_left = max(0, level_time_limit - current_time)
         font = pygame.font.Font(None, 36)
-        text_time = font.render(f"Time Left: {time_left}", True, RED)
-        text_score = font.render(f"Score: {score}", True, RED)
+        text_time = font.render(f"Time Left: {time_left}", True, BLACK)
+        text_score = font.render(f"Score: {score}", True, BLACK)
         screen.blit(text_time, (5, 5))
         screen.blit(text_score, (width - 150, 5))
 
@@ -153,7 +153,7 @@ def main():
         elapsed_time = time.time() - start_time
         if elapsed_time > level_time_limit:
             if not timeout_message_shown:
-                show_message("Time out, Try again!", RED)
+                show_message("Time out, Try again!", WHITE)
                 timeout_message_shown = True
                 # Reset necessary variables for a new game
                 cols, rows = 21, 21  # Reset maze dimensions
@@ -167,7 +167,7 @@ def main():
 
         if (player_x, player_y) == (exit_x, exit_y):
             if not show_congratulations:
-                show_message("Congratulations, YOU WON!", BLACK)
+                show_message("Congratulations, YOU WON!", WHITE)
                 show_congratulations = True
             else:
                 next_level()

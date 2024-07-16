@@ -2,17 +2,17 @@ import pygame
 import random
 import time
 
-# Initialize Pygame
+# Initializes Pygame
 pygame.init()
 
 # Screen dimensions
 width, height = 650, 650
-cols, rows = 21, 21  # Ensure cols and rows are odd numbers for a perfect maze
+cols, rows = 21, 21 
 cell_size = width // cols
 player_x, player_y = 1, 1
 exit_x, exit_y = cols - 2, rows - 2
 
-# Set up display
+# Sets up display
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Maze Generator")
 
@@ -23,7 +23,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 
-# Load the character image
+# Loads the character image
 try:
     character_image = pygame.image.load("C:/Projects/Character01.png")
     character_image = pygame.transform.scale(character_image, (cell_size, cell_size))
@@ -32,10 +32,10 @@ except pygame.error as e:
     pygame.quit()
     exit()
 
-# Initialize the maze grid
+# Initializes the maze grid
 maze = [[0 for _ in range(cols)] for _ in range(rows)]
 
-# Initialize score
+# Initializes score
 score = 0
 
 def is_valid_move(x, y):
@@ -130,7 +130,7 @@ def main():
         "You have 1 minute per level. Good luck!"
     ]
 
-    # Display tutorial messages line by line
+    # Displays tutorial messages line by line
     for message in tutorial_messages:
         show_message(message, WHITE)
 

@@ -14,7 +14,7 @@ exit_x, exit_y = cols - 2, rows - 2
 
 # Sets up display
 screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Maze Generator")
+pygame.display.set_caption("Maze Navigation Game")
 
 # Colors
 WHITE = (255, 255, 255)
